@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { RadioGroup, RadioGroupItem } from '../ui/Radiogroup';
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -15,10 +15,19 @@ type FormValues = {
   mortgageType: TMortgageType;
 };
 
-const schema = yup.object().shape({
-  mortgageAmount: yup.string().required('This field is required'),
-  mortgageTerm: yup.string().required('This field is required'),
-  interestRate: yup.string().required('This field is required'),
+const schema = yup.object({
+  mortgageAmount: yup
+    .string()
+    .required('This field is required')
+    .typeError('Please input a valid number'),
+  mortgageTerm: yup
+    .string()
+    .required('This field is required')
+    .typeError('Please input a valid number'),
+  interestRate: yup
+    .string()
+    .required('This field is required')
+    .typeError('Please input a valid numbers'),
   mortgageType: yup
     .string()
     .oneOf(['Repayment', 'Interest Only'], 'Please select a query type.')
@@ -26,6 +35,10 @@ const schema = yup.object().shape({
 });
 
 const Form = () => {
+  const [issubmitted, setIsSubmitted] = useState<boolean>(false);
+  const [monthlyPay, setMonthlyPay] = useState<number | null | string>(null);
+  const [totalPay, setTotalPay] = useState<number | string | null>(null);
+
   const {
     register,
     handleSubmit,
@@ -36,9 +49,32 @@ const Form = () => {
     resolver: yupResolver(schema),
   });
   const onSubmit = (data: FormValues) => {
-    console.log('yessss');
-    console.log(data);
+    mortgageCalculator(data);
   };
+
+  const mortgageCalculator = (data: FormValues) => {
+    setIsSubmitted(true);
+    const loanAmount = parseFloat(data.mortgageAmount);
+    const interestRate = parseFloat(data.interestRate) / 100 / 12;
+    const loanTerm = parseInt(data.mortgageTerm) * 12;
+    const monthlyPayment =
+      (loanAmount * (interestRate * Math.pow(1 + interestRate, loanTerm))) /
+      (Math.pow(1 + interestRate, loanTerm) - 1);
+
+    const mortgageRepayment =
+      '£' +
+      monthlyPayment.toLocaleString('en-US', { maximumFractionDigits: 2 });
+    const totalRepayment =
+      '£' +
+      (monthlyPayment * loanTerm).toLocaleString('en-US', {
+        maximumFractionDigits: 2,
+      });
+    setMonthlyPay(mortgageRepayment);
+    setTotalPay(totalRepayment);
+    console.log(monthlyPay);
+    console.log(totalPay);
+  };
+
   return (
     <div className='md:w-[740px] lg:w-[800px] md:flex md:rounded-2xl overflow-hidden md:bg-white'>
       <div className='w-[90%] md:w-[50%] md:bg-white mx-auto py-3 md:p-8'>
@@ -61,7 +97,7 @@ const Form = () => {
                 errors.mortgageAmount
                   ? 'border-red mb-0'
                   : 'border-Slate700 mb-4'
-              } w-full block h-10 rounded-md px-14 text-Slate900 border border-Slate700 focus:outline-none focus:border-lime`}
+              } w-full block h-10 rounded-md px-14 bg-white text-Slate900 border border-Slate700 focus:outline-none focus:border-lime`}
             />
             <span
               className={` ${
@@ -88,7 +124,7 @@ const Form = () => {
                   {...register('mortgageTerm')}
                   className={` ${
                     errors.mortgageTerm ? 'border-red' : 'border-Slate700'
-                  } w-full block h-10 rounded-md px-3 text-Slate900 border border-Slate700 focus:outline-none focus:border-lime`}
+                  } w-full block h-10 rounded-md px-3 bg-white text-Slate900 border border-Slate700 focus:outline-none focus:border-lime`}
                 />
                 <span
                   className={` ${
@@ -118,7 +154,7 @@ const Form = () => {
                   {...register('interestRate')}
                   className={`${
                     errors.interestRate ? 'border-red' : 'border-Slate700'
-                  } w-full block h-10 rounded-md px-3 text-Slate900 border border-Slate700 focus:outline-none focus:border-lime`}
+                  } w-full block h-10 rounded-md px-3 bg-white text-Slate900 border border-Slate700 focus:outline-none focus:border-lime`}
                 />
                 <span
                   className={`${
@@ -210,15 +246,45 @@ const Form = () => {
           </div>
         </form>
       </div>
-      <div className='bg-Slate900 text-white flex flex-col items-center md:justify-center gap-3 px-6 py-6 md:w-[50%] md:rounded-bl-[80px]'>
-        <div>
-          <img src='/illustration-empty.svg' alt='' />
-        </div>
-        <h4>Results shown here</h4>
-        <p className='text-center text-sm max-w-72'>
-          Complete the form and click “calculate repayments” to see what your
-          monthly repayments would be.
-        </p>
+      <div className=' text-white bg-Slate800  px-6 py-6 md:w-[50%] md:rounded-bl-[80px]'>
+        {issubmitted ? (
+          <div className='flex justify-center'>
+            <div className='sm:w-[350px]'>
+              <h3 className='text-xl font-medium md:mt-1'>Your results</h3>
+              <p className='md:mt-2'>
+                Your results are shown below based on the information you
+                provided. To adjust the results, edit the form and click
+                “calculate repayments” again.
+              </p>
+              <div className='bg-lime pt-[2px] rounded-lg overflow-hidden my-4 md:my-6'>
+                <div className='bg-Slate900 px-4 overflow-hidden'>
+                  <div>
+                    <h5 className='py-2'>Your monthly repayments </h5>
+                    <p className='text-4xl pt-1 pb-3 md:text-5xl text-lime font-bold border-b '>
+                      {monthlyPay}
+                    </p>
+                  </div>
+                  {/* <hr className='h-12' /> */}
+                  <div className='py-3'>
+                    <h5>Total you'll repay over the term</h5>
+                    <p className='text-lg font-bold py-1'>{totalPay}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className='flex flex-col items-center h-full md:justify-center gap-3'>
+            <div>
+              <img src='/illustration-empty.svg' alt='illustration-empty' />
+            </div>
+            <h4>Results shown here</h4>
+            <p className='text-center text-sm max-w-72'>
+              Complete the form and click “calculate repayments” to see what
+              your monthly repayments would be.
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );
