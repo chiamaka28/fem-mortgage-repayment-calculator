@@ -18,6 +18,9 @@ const config: Config = {
        'Slate700': 'hsl(200, 24%, 40%)',
        'Slate900': 'hsl(202, 55%, 16%)'
       },
+      fontFamily:  {
+        sans: ['var(--font-plusJakarta)']
+      },
     },
   },
   plugins: [],

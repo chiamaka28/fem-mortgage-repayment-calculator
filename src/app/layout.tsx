@@ -1,4 +1,5 @@
 import './globals.css';
+import { plusJakarta } from './ui/fonts';
 
 export default function RootLayout({
   children,
@@ -6,7 +7,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en'>
+    <html lang='en' className={`${plusJakarta}`}>
       <body>
         <header>
           <h1 className='sr-only'>MORTGAGE REPAYMENT CALCULATOR</h1>
