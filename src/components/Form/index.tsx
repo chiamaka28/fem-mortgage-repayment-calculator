@@ -30,7 +30,7 @@ const schema = yup.object({
     .string()
     .required('This field is required')
     .transform((value) => (value === '' ? null : Number(value)))
-    .typeError('Please input a valid numbers'),
+    .typeError('Please input a valid number'),
   mortgageType: yup
     .string()
     .oneOf(['Repayment', 'Interest Only'], 'Please select a query type.')
@@ -46,7 +46,6 @@ const Form = () => {
     register,
     handleSubmit,
     formState: { errors },
-    watch,
     reset,
     setValue,
   } = useForm({
@@ -245,7 +244,7 @@ const Form = () => {
                   </div>
                   {/* <hr className='h-12' /> */}
                   <div className='py-3'>
-                    <h5>Total you'll repay over the term</h5>
+                    <h5>Total you&#39;ll repay over the term</h5>
                     <p className='text-lg font-bold py-1'>{totalPay}</p>
                   </div>
                 </div>
