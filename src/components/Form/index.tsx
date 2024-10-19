@@ -19,14 +19,17 @@ const schema = yup.object({
   mortgageAmount: yup
     .string()
     .required('This field is required')
+    .transform((value) => (value === '' ? null : Number(value)))
     .typeError('Please input a valid number'),
   mortgageTerm: yup
     .string()
     .required('This field is required')
+    .transform((value) => (value === '' ? null : Number(value)))
     .typeError('Please input a valid number'),
   interestRate: yup
     .string()
     .required('This field is required')
+    .transform((value) => (value === '' ? null : Number(value)))
     .typeError('Please input a valid numbers'),
   mortgageType: yup
     .string()
@@ -44,12 +47,17 @@ const Form = () => {
     handleSubmit,
     formState: { errors },
     watch,
+    reset,
     setValue,
   } = useForm({
     resolver: yupResolver(schema),
   });
   const onSubmit = (data: FormValues) => {
     mortgageCalculator(data);
+  };
+
+  const handleClear = () => {
+    reset();
   };
 
   const mortgageCalculator = (data: FormValues) => {
@@ -80,7 +88,10 @@ const Form = () => {
       <div className='w-[90%] md:w-[50%] md:bg-white mx-auto py-3 md:p-8'>
         <div className='md:flex md:justify-between md:items-center'>
           <h2 className='text-Slate900 text-xl'>Mortgage Calculator</h2>
-          <button className='border-none underline text-Slate700 text-sm '>
+          <button
+            onClick={handleClear}
+            className='border-none underline text-Slate700 text-sm '
+          >
             Clear All
           </button>
         </div>
@@ -171,38 +182,6 @@ const Form = () => {
               </span>
             </div>
           </div>
-          {/* <fieldset className='text-Slate900 flex flex-col gap-2'>
-            <legend className='text-Slate700 text-sm'>Mortgage Type</legend>
-            <div className='border border-Slate700 hover:border-lime h-10 rounded-md flex items-center gap-2 px-3 mt-2'>
-              <div className='relative'>
-                <input
-                  type='radio'
-                  value='repayment'
-                  id='repayment'
-                  className='peer hidden'
-                  {...register('mortgageType')}
-                />
-                <div className='w-4 h-4 bg-white border border-Slate700 peer-checked:border-lime peer-checked:bg-white rounded-full'></div>
-                <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-white peer-checked:bg-lime  rounded-full peer-checked:border peer-checked:border-lime'></div>
-              </div>
-
-              <label htmlFor='repayment'>Repayment</label>
-            </div>
-            <div className='border border-Slate700 hover:border-lime h-10 rounded-md flex items-center gap-2 px-3'>
-              <div className='relative'>
-                <input
-                  type='radio'
-                  value='interest'
-                  id='interest'
-                  className='peer hidden'
-                  {...register('mortgageType')}
-                />
-                <div className='w-4 h-4 bg-white border border-Slate700 peer-checked:border-lime peer-checked:bg-white rounded-full'></div>
-                <div className='absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-2 h-2 bg-white peer-checked:bg-lime  rounded-full peer-checked:border peer-checked:border-lime'></div>
-              </div>
-              <label htmlFor='interest'>Interest Only</label>
-            </div>
-          </fieldset> */}
           <fieldset className='mt-3'>
             <legend className='text-Slate700 text-sm'>Mortgage Type</legend>
             <RadioGroup
@@ -212,7 +191,7 @@ const Form = () => {
               }}
             >
               <label
-                className={`inline-flex w-full  h-10 items-center rounded-lg border border-Slate700  px-4 py-1`}
+                className={`inline-flex w-full  h-10 items-center rounded-lg border border-Slate700 hover:border-lime  px-4 py-1`}
                 htmlFor='general'
               >
                 <RadioGroupItem
@@ -223,7 +202,7 @@ const Form = () => {
                 <span className='text-Slate900 '>Repayment</span>
               </label>
               <label
-                className={`inline-flex w-full  h-10 items-center rounded-lg border border-Slate700  px-4 py-1`}
+                className={` inline-flex w-full  h-10 items-center rounded-lg border border-Slate700 hover:border-lime  px-4 py-1`}
                 htmlFor='support'
               >
                 <RadioGroupItem
